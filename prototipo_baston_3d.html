@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototipo Bastón Inteligente 3D</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<style>
+body { font-family: 'Inter', sans-serif; overflow: hidden; background-color: #0f172a; color: #f8fafc; }
+#webgl-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
+.ui-panel { z-index: 10; backdrop-filter: blur(12px); background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.12); }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+</style>
+</head>
+<body class="h-screen w-screen relative select-none">
+<div id="webgl-container"></div>
+
+<header class="ui-panel fixed top-4 left-4 right-4 md:left-6 md:right-auto md:w-96 p-4 rounded-2xl shadow-2xl flex items-center justify-between border-l-4 border-l-cyan-500">
+<div>
+<h1 class="text-lg font-bold tracking-wide text-white flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles text-cyan-400"></i> SmartCane Pro 3D</h1>
+<p class="text-xs text-slate-400">Bastón Guía + Navegación GPS + SOS</p>
+</div>
+<span id="system-status-badge" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Activo</span>
+</header>
+
+<div id="info-card" class="ui-panel fixed top-24 left-4 right-4 md:left-6 md:w-96 p-5 rounded-2xl shadow-2xl transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-2">
+<div class="flex justify-between items-start mb-2">
+<h3 id="comp-title" class="font-bold text-cyan-400 text-base">Componente</h3>
+<button id="close-card" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<p id="comp-desc" class="text-sm text-slate-300 leading-relaxed mb-3">Haz clic en las partes del bastón para inspeccionar detalles.</p>
+<div id="comp-specs" class="text-xs text-slate-400 bg-slate-900/80 p-2.5 rounded-lg border border-slate-800"></div>
+</div>
+
+<aside class="ui-panel fixed top-4 right-4 bottom-4 w-80 p-4 rounded-2xl shadow-2xl flex flex-col justify-between overflow-y-auto hidden md:flex space-y-4">
+<div class="space-y-4">
+<div class="bg-cyan-950/40 border border-cyan-500/30 p-3 rounded-xl space-y-2">
+<h3 class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center justify-between">
+<span><i class="fa-solid fa-microphone text-cyan-400 animate-pulse"></i> Comandos por Voz</span>
+<span class="text-[10px] text-cyan-300 bg-cyan-900/60 px-2 py-0.5 rounded">Micrófono Activo</span>
+</h3>
+<div class="grid grid-cols-2 gap-1.5 pt-1">
+<button id="btn-voice-gps" class="py-1.5 px-2 bg-slate-800 hover:bg-cyan-900/40 text-slate-200 text-[11px] rounded border border-slate-700 text-left transition flex items-center gap-1.5"><i class="fa-solid fa-comment-dots text-cyan-400"></i> "¿Dónde estoy?"</button>
+<button id="btn-voice-dest" class="py-1.5 px-2 bg-slate-800 hover:bg-cyan-900/40 text-slate-200 text-[11px] rounded border border-slate-700 text-left transition flex items-center gap-1.5"><i class="fa-solid fa-route text-cyan-400"></i> "Ir a casa"</button>
+</div>
+<div id="voice-response" class="bg-slate-950 p-2 rounded text-[11px] text-cyan-200 italic border border-slate-800"><i class="fa-solid fa-volume-high mr-1 text-cyan-400"></i> Escuchando... "Presiona un comando de voz"</div>
+</div>
+
+<div class="bg-red-500/10 border border-red-500/30 p-3 rounded-xl flex items-center justify-between">
+<div>
+<h3 class="text-xs font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation"></i> Botón SOS Estructural</h3>
+<p class="text-[11px] text-slate-400">Integrado en el mango</p>
+</div>
+<button id="trigger-sos" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-lg shadow-lg shadow-red-600/30 active:scale-95 transition flex items-center gap-1"><i class="fa-solid fa-bell"></i> SOS</button>
+</div>
+
+<div class="bg-slate-900/90 border border-slate-800 p-3 rounded-xl space-y-2">
+<h2 class="text-xs font-semibold text-cyan-400 uppercase tracking-wider flex items-center justify-between">
+<span><i class="fa-solid fa-location-arrow mr-1"></i> Módulo GPS Incorporado</span>
+<span class="text-[10px] text-emerald-400 font-mono">GPS OK</span>
+</h2>
+<div class="bg-slate-950 p-2 rounded-lg border border-slate-800 text-xs space-y-1">
+<div class="flex justify-between text-slate-400"><span>Ruta activa:</span><span id="gps-route" class="text-slate-200">Av. Central ➔ Estación Metrobús</span></div>
+<div class="flex justify-between text-slate-400"><span>Indicación por altavoz:</span><span id="gps-nav-step" class="text-cyan-300 font-semibold">A 15m gira a la derecha</span></div>
+</div>
+</div>
+
+<div>
+<h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Detección de Obstáculos</h2>
+<div class="space-y-3">
+<div>
+<div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Distancia Obstáculo Piso</span><span id="dist-val" class="font-mono text-cyan-400">1.8 m</span></div>
+<input type="range" id="dist-slider" min="0.2" max="4.0" step="0.1" value="1.8" class="w-full accent-cyan-500 bg-slate-700 h-1.5 rounded-lg appearance-none cursor-pointer">
+</div>
+<div>
+<div class="flex justify-between text-xs mb-1"><span class="text-slate-400">Obstáculo Flotante (Cabeza)</span><span id="head-dist-val" class="font-mono text-amber-400">Libre</span></div>
+<button id="toggle-head-obstacle" class="w-full py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-xs rounded-xl border border-slate-700 transition flex items-center justify-between"><span>Simular Rama / Letrero Alto</span><i id="head-icon" class="fa-solid fa-toggle-off text-slate-500 text-base"></i></button>
+</div>
+</div>
+</div>
+
+<hr class="border-slate-800">
+
+<div>
+<h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Luces LED Laterales</h2>
+<div class="grid grid-cols-2 gap-2">
+<button id="toggle-led" class="py-2 px-2 text-xs rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30 transition text-center"><i class="fa-solid fa-lightbulb mb-1 block"></i> LED Laterales</button>
+<button id="toggle-strobe" class="py-2 px-2 text-xs rounded-lg bg-slate-800 text-slate-300 border border-slate-700 hover:bg-slate-700 transition text-center"><i class="fa-solid fa-bolt mb-1 block"></i> Destellos SOS</button>
+</div>
+</div>
+
+<div>
+<h2 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Alertas Hápticas y Audio</h2>
+<div class="space-y-2">
+<div class="p-2.5 bg-slate-900/80 rounded-xl border border-slate-800 flex items-center justify-between text-xs"><span class="text-slate-400">Vibración Mango:</span><span id="haptic-status" class="font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400">Inactivo</span></div>
+<div class="p-2.5 bg-slate-900/80 rounded-xl border border-slate-800 flex items-center justify-between text-xs"><span class="text-slate-400">Altavoz / Tono:</span><span id="audio-status" class="font-mono text-cyan-400">Silencioso</span></div>
+</div>
+</div>
+</div>
+
+<div class="pt-2">
+<button id="reset-cam" class="w-full py-2 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2"><i class="fa-solid fa-arrows-to-eye"></i> Reajustar Vista 3D</button>
+</div>
+</aside>
+
+<div class="ui-panel fixed bottom-4 left-4 right-4 p-3 rounded-2xl shadow-2xl flex md:hidden justify-around items-center text-xs">
+<button id="m-sos-btn" class="flex flex-col items-center gap-1 text-red-400 font-bold"><i class="fa-solid fa-bell text-base"></i><span>SOS</span></button>
+<button id="m-dist-btn" class="flex flex-col items-center gap-1 text-cyan-400"><i class="fa-solid fa-radar text-base"></i><span>Cerca/Lejos</span></button>
+<button id="m-head-btn" class="flex flex-col items-center gap-1 text-amber-400"><i class="fa-solid fa-triangle-exclamation text-base"></i><span>Alto</span></button>
+<button id="m-reset-btn" class="flex flex-col items-center gap-1 text-slate-300"><i class="fa-solid fa-rotate text-base"></i><span>Reiniciar</span></button>
+</div>
+
+<script>
+const state = { obstacleDistance: 1.8, headObstacle: false, ledOn: true, strobeMode: false, sosActive: false, audioCtx: null, lastBeep: 0 };
+
+const componentInfo = {
+'handle': { title: 'Empuñadura Ergonómica Háptica', desc: 'Diseño antideslizante con 2 motores de vibración resonante integrados en la estructura para guiar al usuario.', specs: 'Silicona Médica | 2x Motores LRA Hápticos | Resistencia IP67' },
+'sos_button': { title: 'Botón de Emergencia (SOS) Físico', desc: 'Integrado en la parte superior del mango para un acceso rápido con el pulgar. Al presionarlo activa alarma de pánico (95dB) y envía geolocalización GPS.', specs: 'Acceso Inmediato | Alarma de 95dB | Envío GPS de Emergencia' },
+'voice_speaker': { title: 'Altavoz y Micrófono de Comando por Voz', desc: 'Módulo de audio bidireccional integrado en la empuñadura. Permite solicitar la ubicación GPS, dictar destinos por voz y escuchar indicaciones de guía.', specs: 'Micrófono Canc. Ruido | Altavoz de Alta Claridad | Asistente de Voz Integrado' },
+'gps_module': { title: 'Módulo GPS Integrado en el Cuerpo', desc: 'Antena GPS/GNSS embebida en la estructura del bastón para rastreo de ubicación en tiempo real y guías de navegación paso a paso.', specs: 'Geolocalización GNSS | Bluetooth 5.2 | Precisión Sub-métrica' },
+'upper_sensor': { title: 'Sensor Ultrasónico Superior (Cabeza)', desc: 'Montado en la parte superior del cuerpo para detectar obstáculos aéreos o flotantes (ramas, letreros, toldos).', specs: 'Rango: 0.3m - 2.5m | Ángulo 45° | Frecuencia 40kHz' },
+'side_leds': { title: 'Luces LED Laterales de Alta Visibilidad', desc: 'Tiras de luz LED integradas a ambos lados a lo largo del bastón. Ofrecen señalización omnidireccional nocturna y destellos de alerta.', specs: 'Tiras Dobles Laterales | 250 Lúmenes | Modos Fijo y Parpadeo SOS' },
+'main_shaft': { title: 'Cuerpo Principal de Carbono', desc: 'Estructura ultraligera de fibra de carbono que aloja internamente el cableado y componentes electrónicos protegidos contra agua y golpes.', specs: 'Fibra de Carbono 3K | Ultraligero 280g | Estructura Integrada' },
+'lower_sensor': { title: 'Sensor Ultrasónico Inferior (Piso)', desc: 'Escanea continuamente la ruta inferior detectando baches, escalones descendentes y obstáculos en el piso.', specs: 'Detección a 100Hz | Mapeo de terreno y baches' },
+'tip': { title: 'Punta Rodante Omnidireccional', desc: 'Esfera rodante de polímero técnico que permite un continuo desplazamiento sobre cualquier superficie.', specs: 'Polímero UHMW-PE | Rodamientos Cerámicos IP67' }
+};
+
+let scene, camera, renderer, controls;
+let caneGroup = new THREE.Group();
+let raycaster = new THREE.Raycaster();
+let mouse = new THREE.Vector2();
+let sonarRings = [];
+let headSonarRings = [];
+let ledMeshMaterial, leftLedStripMat, rightLedStripMat, sosBtnMaterial;
+let obstacleMesh, headObstacleMesh;
+const interactiveMeshes = [];
+
+function initAudio() {
+if (!state.audioCtx) { state.audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+}
+
+function playBeep(freq, duration, volume = 0.08) {
+if (!state.audioCtx) return;
+try {
+const osc = state.audioCtx.createOscillator();
+const gain = state.audioCtx.createGain();
+osc.type = 'sine';
+osc.frequency.setValueAtTime(freq, state.audioCtx.currentTime);
+gain.gain.setValueAtTime(volume, state.audioCtx.currentTime);
+gain.gain.exponentialRampToValueAtTime(0.001, state.audioCtx.currentTime + duration);
+osc.connect(gain);
+gain.connect(state.audioCtx.destination);
+osc.start();
+osc.stop(state.audioCtx.currentTime + duration);
+} catch (e) {}
+}
+
+function init3D() {
+const container = document.getElementById('webgl-container');
+scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b1120);
+scene.fog = new THREE.FogExp2(0x0b1120, 0.08);
+camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.set(2.6, 1.2, 3.6);
+renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+container.appendChild(renderer.domElement);
+controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.maxPolarAngle = Math.PI / 2 + 0.1;
+controls.minDistance = 1;
+controls.maxDistance = 8;
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambientLight);
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+dirLight.position.set(5, 10, 7);
+dirLight.castShadow = true;
+scene.add(dirLight);
+const cyanLight = new THREE.PointLight(0x06b6d4, 1.5, 5);
+cyanLight.position.set(-2, 2, -1);
+scene.add(cyanLight);
+const gridHelper = new THREE.GridHelper(20, 40, 0x1e293b, 0x0f172a);
+gridHelper.position.y = -1.2;
+scene.add(gridHelper);
+const floorGeo = new THREE.PlaneGeometry(30, 30);
+const floorMat = new THREE.MeshStandardMaterial({ color: 0x080e1a, roughness: 0.8 });
+const floor = new THREE.Mesh(floorGeo, floorMat);
+floor.rotation.x = -Math.PI / 2;
+floor.position.y = -1.205;
+floor.receiveShadow = true;
+scene.add(floor);
+buildCaneModel();
+buildObstacles();
+window.addEventListener('resize', onWindowResize);
+window.addEventListener('click', onPointerClick);
+animate();
+}
+
+function buildCaneModel() {
+caneGroup = new THREE.Group();
+const carbonMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.3, metalness: 0.7 });
+const rubberMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.9 });
+const metallicMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.2 });
+const sensorMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.5, roughness: 0.2 });
+const speakerGrilleMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.3 });
+ledMeshMaterial = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
+leftLedStripMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+rightLedStripMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+sosBtnMaterial = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+
+const handleGeo = new THREE.CylinderGeometry(0.032, 0.028, 0.35, 32);
+const handleMesh = new THREE.Mesh(handleGeo, rubberMat);
+handleMesh.position.set(0, 0.9, 0.05);
+handleMesh.rotation.x = -0.2;
+handleMesh.castShadow = true;
+handleMesh.userData = { id: 'handle' };
+caneGroup.add(handleMesh);
+interactiveMeshes.push(handleMesh);
+
+const sosBtnGeo = new THREE.CylinderGeometry(0.016, 0.016, 0.014, 32);
+const sosBtn = new THREE.Mesh(sosBtnGeo, sosBtnMaterial);
+sosBtn.position.set(0, 1.075, 0.095);
+sosBtn.rotation.x = -0.2;
+sosBtn.userData = { id: 'sos_button' };
+caneGroup.add(sosBtn);
+interactiveMeshes.push(sosBtn);
+
+const speakerGeo = new THREE.CylinderGeometry(0.022, 0.022, 0.05, 16);
+const speakerMesh = new THREE.Mesh(speakerGeo, speakerGrilleMat);
+speakerMesh.position.set(0, 0.88, 0.08);
+speakerMesh.rotation.x = 1.35;
+speakerMesh.userData = { id: 'voice_speaker' };
+caneGroup.add(speakerMesh);
+interactiveMeshes.push(speakerMesh);
+
+const gpsBoxGeo = new THREE.BoxGeometry(0.045, 0.045, 0.025);
+const gpsBox = new THREE.Mesh(gpsBoxGeo, metallicMat);
+gpsBox.position.set(0, 0.98, 0.02);
+gpsBox.userData = { id: 'gps_module' };
+caneGroup.add(gpsBox);
+interactiveMeshes.push(gpsBox);
+
+const upperSensorGeo = new THREE.BoxGeometry(0.05, 0.05, 0.06);
+const upperSensorMesh = new THREE.Mesh(upperSensorGeo, sensorMat);
+upperSensorMesh.position.set(0, 0.76, 0.04);
+upperSensorMesh.userData = { id: 'upper_sensor' };
+caneGroup.add(upperSensorMesh);
+interactiveMeshes.push(upperSensorMesh);
+
+const shaftGeo = new THREE.CylinderGeometry(0.014, 0.012, 1.3, 32);
+const shaftMesh = new THREE.Mesh(shaftGeo, carbonMat);
+shaftMesh.position.set(0, -0.05, 0);
+shaftMesh.castShadow = true;
+shaftMesh.userData = { id: 'main_shaft' };
+caneGroup.add(shaftMesh);
+interactiveMeshes.push(shaftMesh);
+
+const leftLedGeo = new THREE.BoxGeometry(0.006, 0.95, 0.008);
+const leftLedMesh = new THREE.Mesh(leftLedGeo, leftLedStripMat);
+leftLedMesh.position.set(-0.016, -0.05, 0);
+leftLedMesh.userData = { id: 'side_leds' };
+caneGroup.add(leftLedMesh);
+interactiveMeshes.push(leftLedMesh);
+
+const rightLedGeo = new THREE.BoxGeometry(0.006, 0.95, 0.008);
+const rightLedMesh = new THREE.Mesh(rightLedGeo, rightLedStripMat);
+rightLedMesh.position.set(0.016, -0.05, 0);
+rightLedMesh.userData = { id: 'side_leds' };
+caneGroup.add(rightLedMesh);
+interactiveMeshes.push(rightLedMesh);
+
+const lowerSensorGeo = new THREE.BoxGeometry(0.045, 0.06, 0.05);
+const lowerSensorMesh = new THREE.Mesh(lowerSensorGeo, sensorMat);
+lowerSensorMesh.position.set(0, -0.58, 0.02);
+lowerSensorMesh.userData = { id: 'lower_sensor' };
+caneGroup.add(lowerSensorMesh);
+interactiveMeshes.push(lowerSensorMesh);
+
+const tipMountGeo = new THREE.CylinderGeometry(0.01, 0.01, 0.08, 16);
+const tipMount = new THREE.Mesh(tipMountGeo, metallicMat);
+tipMount.position.set(0, -0.72, 0);
+caneGroup.add(tipMount);
+
+const tipBallGeo = new THREE.SphereGeometry(0.04, 32, 32);
+const tipBallMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.4 });
+const tipBall = new THREE.Mesh(tipBallGeo, tipBallMat);
+tipBall.position.set(0, -0.78, 0);
+tipBall.castShadow = true;
+tipBall.userData = { id: 'tip' };
+caneGroup.add(tipBall);
+interactiveMeshes.push(tipBall);
+
+caneGroup.rotation.z = -0.15;
+caneGroup.position.y = 0.2;
+scene.add(caneGroup);
+createSonarRings();
+}
+
+function createSonarRings() {
+const ringGeo = new THREE.RingGeometry(0.05, 0.07, 32);
+const ringMat = new THREE.MeshBasicMaterial({ color: 0x06b6d4, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
+for (let i = 0; i < 3; i++) {
+const ring = new THREE.Mesh(ringGeo, ringMat.clone());
+ring.rotation.x = Math.PI / 2;
+ring.position.set(0, -0.58, 0.05);
+scene.add(ring);
+sonarRings.push({ mesh: ring, scale: i * 0.4, speed: 0.015 });
+}
+const headRingMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, side: THREE.DoubleSide, transparent: true, opacity: 0 });
+for (let i = 0; i < 3; i++) {
+const ring = new THREE.Mesh(ringGeo, headRingMat.clone());
+ring.rotation.x = Math.PI / 2;
+ring.position.set(0, 0.76, 0.05);
+scene.add(ring);
+headSonarRings.push({ mesh: ring, scale: i * 0.4, speed: 0.02 });
+}
+}
+
+function buildObstacles() {
+const boxGeo = new THREE.BoxGeometry(0.6, 0.8, 0.6);
+const boxMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.5, transparent: true, opacity: 0.85 });
+obstacleMesh = new THREE.Mesh(boxGeo, boxMat);
+obstacleMesh.position.set(1.5, -0.8, 0.2);
+obstacleMesh.castShadow = true;
+scene.add(obstacleMesh);
+const headBoxGeo = new THREE.BoxGeometry(0.8, 0.3, 0.4);
+const headBoxMat = new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.6, wireframe: true });
+headObstacleMesh = new THREE.Mesh(headBoxGeo, headBoxMat);
+headObstacleMesh.position.set(0.8, 0.8, 0.2);
+headObstacleMesh.visible = false;
+scene.add(headObstacleMesh);
+}
+
+function animate() {
+requestAnimationFrame(animate);
+controls.update();
+const caneWorldPos = new THREE.Vector3();
+caneGroup.children.find(c => c.userData.id === 'lower_sensor')?.getWorldPosition(caneWorldPos);
+if (obstacleMesh) { obstacleMesh.position.x = state.obstacleDistance * 0.9; }
+sonarRings.forEach(r => {
+r.scale += r.speed * (4.2 - state.obstacleDistance);
+if (r.scale > state.obstacleDistance * 0.9) r.scale = 0.05;
+r.mesh.scale.set(r.scale * 3, r.scale * 3, 1);
+r.mesh.position.set(caneWorldPos.x + r.scale * 0.7, caneWorldPos.y - r.scale * 0.2, caneWorldPos.z);
+r.mesh.rotation.y = Math.PI / 3;
+r.mesh.material.opacity = Math.max(0, 1 - (r.scale / (state.obstacleDistance * 0.9)));
+r.mesh.material.color.setHex(state.obstacleDistance < 0.8 ? 0xef4444 : 0x06b6d4);
+});
+if (state.headObstacle) {
+const headSensorWorldPos = new THREE.Vector3();
+caneGroup.children.find(c => c.userData.id === 'upper_sensor')?.getWorldPosition(headSensorWorldPos);
+headSonarRings.forEach(r => {
+r.scale += r.speed * 2;
+if (r.scale > 1.2) r.scale = 0.05;
+r.mesh.scale.set(r.scale * 2.5, r.scale * 2.5, 1);
+r.mesh.position.set(headSensorWorldPos.x + r.scale * 0.6, headSensorWorldPos.y + 0.1, headSensorWorldPos.z);
+r.mesh.rotation.y = Math.PI / 3;
+r.mesh.material.opacity = Math.max(0, 0.9 - (r.scale / 1.2));
+});
+} else {
+headSonarRings.forEach(r => r.mesh.material.opacity = 0);
+}
+const time = Date.now() * 0.005;
+if (state.sosActive) {
+const flash = Math.sin(time * 8) > 0;
+leftLedStripMat.color.setHex(flash ? 0xef4444 : 0x000000);
+rightLedStripMat.color.setHex(flash ? 0xef4444 : 0x000000);
+sosBtnMaterial.color.setHex(flash ? 0xffffff : 0xef4444);
+} else if (state.strobeMode) {
+const flash = Math.sin(time * 5) > 0;
+leftLedStripMat.color.setHex(flash ? 0x38bdf8 : 0x0284c7);
+rightLedStripMat.color.setHex(flash ? 0x38bdf8 : 0x0284c7);
+sosBtnMaterial.color.setHex(0xef4444);
+} else if (state.ledOn) {
+leftLedStripMat.color.setHex(0x38bdf8);
+rightLedStripMat.color.setHex(0x38bdf8);
+sosBtnMaterial.color.setHex(0xef4444);
+} else {
+leftLedStripMat.color.setHex(0x1e293b);
+rightLedStripMat.color.setHex(0x1e293b);
+sosBtnMaterial.color.setHex(0xef4444);
+}
+updateTelemetryLogic();
+renderer.render(scene, camera);
+}
+
+function updateTelemetryLogic() {
+const hapticEl = document.getElementById('haptic-status');
+const audioEl = document.getElementById('audio-status');
+const now = Date.now();
+const d = state.obstacleDistance;
+let frequencyMs = 0;
+let beepPitch = 440;
+if (state.sosActive) {
+hapticEl.textContent = "¡¡ALERTA SOS ACTIVA!!";
+hapticEl.className = "font-mono px-2 py-0.5 rounded bg-red-500 text-white font-bold animate-ping";
+audioEl.textContent = "Alarma SOS 95dB";
+audioEl.className = "font-mono text-red-500 font-bold";
+frequencyMs = 120;
+beepPitch = 950;
+} else if (d < 0.6 || state.headObstacle) {
+hapticEl.textContent = "Vibración Intensa";
+hapticEl.className = "font-mono px-2 py-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/40 animate-pulse";
+audioEl.textContent = "Peligro Inminente";
+audioEl.className = "font-mono text-red-400 font-bold";
+frequencyMs = 160;
+beepPitch = 880;
+} else if (d < 1.5) {
+hapticEl.textContent = "Vibración Pulsada";
+hapticEl.className = "font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40";
+audioEl.textContent = "Precaución";
+audioEl.className = "font-mono text-amber-400";
+frequencyMs = 450;
+beepPitch = 587;
+} else {
+hapticEl.textContent = "Inactivo";
+hapticEl.className = "font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400";
+audioEl.textContent = "Silencioso";
+audioEl.className = "font-mono text-cyan-400";
+frequencyMs = 0;
+}
+if (frequencyMs > 0 && (now - state.lastBeep > frequencyMs)) {
+playBeep(beepPitch, 0.08, state.sosActive ? 0.2 : 0.08);
+state.lastBeep = now;
+}
+}
+
+function simulateVoiceCommand(cmdType) {
+initAudio();
+const respEl = document.getElementById('voice-response');
+if (cmdType === 'location') {
+respEl.innerHTML = `<i class="fa-solid fa-volume-high text-cyan-400"></i> <b>Bastón dice:</b> "Te encuentras en Av. Central esquina Calle 4. GPS activo."`;
+playBeep(650, 0.15);
+} else if (cmdType === 'destination') {
+respEl.innerHTML = `<i class="fa-solid fa-volume-high text-cyan-400"></i> <b>Bastón dice:</b> "Iniciando ruta hacia Casa. Avance recto 50 metros."`;
+playBeep(520, 0.15);
+}
+}
+
+function onPointerClick(event) {
+if (event.target.tagName !== 'CANVAS') return;
+initAudio();
+mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+raycaster.setFromCamera(mouse, camera);
+const intersects = raycaster.intersectObjects(interactiveMeshes);
+if (intersects.length > 0) {
+const clickedObj = intersects[0].object;
+const componentKey = clickedObj.userData.id;
+if (componentKey && componentInfo[componentKey]) { showComponentCard(componentKey); }
+}
+}
+
+function showComponentCard(key) {
+const data = componentInfo[key];
+const card = document.getElementById('info-card');
+document.getElementById('comp-title').textContent = data.title;
+document.getElementById('comp-desc').textContent = data.desc;
+document.getElementById('comp-specs').textContent = data.specs;
+card.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-2');
+card.classList.add('opacity-100', 'translate-y-0');
+}
+
+function hideComponentCard() {
+const card = document.getElementById('info-card');
+card.classList.add('opacity-0', 'pointer-events-none', '-translate-y-2');
+card.classList.remove('opacity-100', 'translate-y-0');
+}
+
+function toggleSOS() {
+initAudio();
+state.sosActive = !state.sosActive;
+const badge = document.getElementById('system-status-badge');
+if (state.sosActive) {
+badge.className = "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/20 text-red-400 border border-red-500/40 animate-pulse";
+badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span> EMERGENCIA SOS`;
+} else {
+badge.className = "inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Activo`;
+}
+}
+
+function onWindowResize() {
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+window.onload = function() {
+init3D();
+const distSlider = document.getElementById('dist-slider');
+const distVal = document.getElementById('dist-val');
+distSlider.addEventListener('input', (e) => {
+state.obstacleDistance = parseFloat(e.target.value);
+distVal.textContent = `${state.obstacleDistance.toFixed(1)} m`;
+});
+const headBtn = document.getElementById('toggle-head-obstacle');
+const headIcon = document.getElementById('head-icon');
+const headVal = document.getElementById('head-dist-val');
+function toggleHead() {
+state.headObstacle = !state.headObstacle;
+headObstacleMesh.visible = state.headObstacle;
+if (state.headObstacle) {
+headIcon.className = "fa-solid fa-toggle-on text-amber-400 text-base";
+headVal.textContent = "PELIGRO (1.2m)";
+headVal.className = "font-mono text-red-400 font-bold animate-pulse";
+} else {
+headIcon.className = "fa-solid fa-toggle-off text-slate-500 text-base";
+headVal.textContent = "Libre";
+headVal.className = "font-mono text-amber-400";
+}
+}
+headBtn.addEventListener('click', toggleHead);
+document.getElementById('btn-voice-gps')?.addEventListener('click', () => simulateVoiceCommand('location'));
+document.getElementById('btn-voice-dest')?.addEventListener('click', () => simulateVoiceCommand('destination'));
+document.getElementById('trigger-sos').addEventListener('click', toggleSOS);
+document.getElementById('m-sos-btn')?.addEventListener('click', toggleSOS);
+const ledBtn = document.getElementById('toggle-led');
+ledBtn.addEventListener('click', () => {
+state.ledOn = !state.ledOn;
+ledBtn.className = state.ledOn ? 'py-2 px-2 text-xs rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/40 transition text-center' : 'py-2 px-2 text-xs rounded-lg bg-slate-800 text-slate-400 border border-slate-700 transition text-center';
+});
+const strobeBtn = document.getElementById('toggle-strobe');
+strobeBtn.addEventListener('click', () => {
+state.strobeMode = !state.strobeMode;
+strobeBtn.className = state.strobeMode ? 'py-2 px-2 text-xs rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 transition text-center font-bold' : 'py-2 px-2 text-xs rounded-lg bg-slate-800 text-slate-300 border border-slate-700 transition text-center';
+});
+document.getElementById('reset-cam').addEventListener('click', () => { controls.reset(); camera.position.set(2.6, 1.2, 3.6); });
+document.getElementById('close-card').addEventListener('click', hideComponentCard);
+document.getElementById('m-dist-btn')?.addEventListener('click', () => {
+state.obstacleDistance = state.obstacleDistance < 1.0 ? 3.0 : 0.5;
+distSlider.value = state.obstacleDistance;
+distVal.textContent = `${state.obstacleDistance.toFixed(1)} m`;
+});
+document.getElementById('m-head-btn')?.addEventListener('click', toggleHead);
+document.getElementById('m-reset-btn')?.addEventListener('click', () => { controls.reset(); camera.position.set(2.6, 1.2, 3.6); });
+};
+</script>
+</body>
+</html>
