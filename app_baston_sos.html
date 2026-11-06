@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartCane AI Companion - Cyber Edition</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #030712; color: #f3f4f6; }
+.font-orbitron { font-family: 'Orbitron', sans-serif; }
+.neon-glow-cyan { box-shadow: 0 0 25px rgba(6, 182, 212, 0.4), inset 0 0 15px rgba(6, 182, 212, 0.2); }
+.neon-glow-red { box-shadow: 0 0 35px rgba(239, 68, 68, 0.6), inset 0 0 20px rgba(239, 68, 68, 0.3); }
+.neon-border-cyan { border-color: rgba(6, 182, 212, 0.6); }
+.glass-panel { background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); }
+.custom-scroll::-webkit-scrollbar { width: 4px; }
+.custom-scroll::-webkit-scrollbar-track { background: rgba(3, 7, 18, 0.8); }
+.custom-scroll::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.4); border-radius: 9999px; }
+@keyframes pulse-ring { 0% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 0.4; } 100% { transform: scale(0.95); opacity: 0.8; } }
+.animate-pulse-ring { animation: pulse-ring 2.5s infinite ease-in-out; }
+</style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-6 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-gray-950 to-black overflow-x-hidden">
+
+<div class="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+
+<div class="lg:col-span-5 space-y-4">
+<div class="glass-panel p-6 rounded-3xl border border-cyan-500/30 neon-glow-cyan relative overflow-hidden">
+<div class="absolute -right-10 -bottom-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+<div class="flex items-center gap-3.5 mb-4">
+<div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-cyan-600 to-blue-500 flex items-center justify-center text-white shadow-lg shadow-cyan-500/40 text-xl font-bold"><i class="fa-solid fa-atom animate-spin" style="animation-duration: 10s;"></i></div>
+<div>
+<h1 class="font-orbitron font-bold text-white text-xl tracking-wide flex items-center gap-2">CAMINA CONMIGO <span class="text-[9px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 font-mono">NOAH AI</span></h1>
+<p class="text-xs text-cyan-300/80 font-medium">Asistente Neón Accesible para Bastón Inteligente</p>
+</div>
+</div>
+<p class="text-xs text-slate-300 leading-relaxed mb-5">Sincronización Bluetooth en tiempo real con el bastón. Guiado inteligente por voz con NOAH, mapa cibernético con detección háptica y alerta familiar de pánico SOS.</p>
+<button id="btn-trigger-panic" class="w-full py-4 px-5 bg-gradient-to-r from-red-600 via-rose-600 to-red-500 hover:from-red-500 hover:to-rose-400 text-white font-orbitron font-bold text-sm rounded-2xl shadow-xl shadow-red-600/40 border border-red-400/50 transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-3 group">
+<div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-110 transition"><i class="fa-solid fa-bolt text-lg text-white animate-pulse"></i></div>
+<span>ACTIVAR PROTOCOLO SOS</span>
+</button>
+</div>
+
+<div class="glass-panel p-5 rounded-3xl border border-slate-800 space-y-3">
+<h3 class="text-xs font-orbitron font-bold text-cyan-400 tracking-wider flex items-center justify-between">
+<span><i class="fa-solid fa-brain mr-1.5"></i> IA CONEXIÓN HÁPTICA</span>
+<span class="text-[10px] text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/40">ONLINE</span>
+</h3>
+<div class="grid grid-cols-2 gap-3 text-xs">
+<div class="bg-slate-900/90 p-3 rounded-2xl border border-slate-800 flex items-center gap-2.5"><i class="fa-solid fa-wifi text-cyan-400 text-base"></i><div><span class="text-[10px] text-slate-400 block">Latencia Red</span><strong class="text-slate-100 font-mono">12 ms (Ultra)</strong></div></div>
+<div class="bg-slate-900/90 p-3 rounded-2xl border border-slate-800 flex items-center gap-2.5"><i class="fa-solid fa-battery-charging text-emerald-400 text-base"></i><div><span class="text-[10px] text-slate-400 block">Batería Bastón</span><strong class="text-emerald-400 font-mono">96% (Carga Qi)</strong></div></div>
+</div>
+</div>
+
+<button id="download-app-html" class="w-full py-3.5 px-4 bg-slate-900/90 hover:bg-slate-800 border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 font-semibold text-xs rounded-2xl transition-all duration-300 flex items-center justify-center gap-2.5 shadow-lg"><i class="fa-solid fa-download text-sm"></i> Guardar App Móvil (.html)</button>
+</div>
+
+<div class="lg:col-span-7 flex justify-center">
+<div class="w-full max-w-sm bg-slate-950 border-[3px] border-cyan-500/40 rounded-[44px] p-4 neon-glow-cyan relative overflow-hidden flex flex-col h-[740px]">
+<div class="absolute -top-20 -left-20 w-48 h-48 bg-cyan-600/20 rounded-full blur-3xl pointer-events-none"></div>
+<div class="absolute top-1/2 -right-20 w-48 h-48 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+<div class="flex justify-between items-center text-[11px] text-slate-400 px-3 pt-1 pb-2 border-b border-slate-800/80 relative z-10">
+<span class="font-orbitron font-bold text-cyan-300 tracking-widest">10:42</span>
+<div class="w-24 h-5 bg-slate-900 border border-slate-800 rounded-full mx-auto flex items-center justify-between px-2 text-[9px] text-cyan-400"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span><span class="font-mono text-[8px] tracking-tighter">CAMINA OS</span></div>
+<div class="flex items-center gap-1.5 text-xs text-slate-300"><i class="fa-solid fa-bluetooth text-cyan-400 animate-pulse"></i><i class="fa-solid fa-signal text-cyan-400"></i><i class="fa-solid fa-bolt-lightning text-emerald-400"></i></div>
+</div>
+
+<div class="py-3 px-2 flex items-center justify-between relative z-10">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-purple-600 p-0.5 flex items-center justify-center"><div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-cyan-300 font-orbitron text-xs font-bold">CC</div></div>
+<div><h2 class="font-orbitron font-bold text-white text-sm tracking-wide">CAMINA CONMIGO</h2><p class="text-[10px] text-cyan-400 font-mono">Asistente: NOAH • En Línea</p></div>
+</div>
+<button id="btn-open-settings" class="w-8 h-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-cyan-400 hover:bg-slate-800 transition"><i class="fa-solid fa-sliders text-xs"></i></button>
+</div>
+
+<div class="flex-1 overflow-y-auto custom-scroll space-y-3.5 pr-1 py-1 relative z-10" id="app-view-container">
+
+<div id="view-dashboard" class="space-y-3.5">
+
+<div id="bluetooth-status-card" class="bg-slate-900/90 border border-cyan-500/40 p-3 rounded-2xl flex items-center justify-between shadow-lg">
+<div class="flex items-center gap-3">
+<div id="bt-icon-bg" class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-400/50 flex items-center justify-center text-sm shadow-md shadow-cyan-500/30"><i class="fa-solid fa-bluetooth animate-pulse"></i></div>
+<div>
+<div class="flex items-center gap-1.5"><span class="text-xs font-orbitron font-bold text-white">CONEXIÓN BLUETOOTH</span><span id="bt-status-badge" class="text-[9px] bg-emerald-950 text-emerald-400 px-2 py-0.2 rounded-full border border-emerald-500/40 font-mono">VIRTUAL OK</span></div>
+<p id="bt-device-name" class="text-[10px] text-slate-400 font-mono">Bastón "SmartCane-V2" Vinculado</p>
+</div>
+</div>
+<button id="btn-toggle-bt" class="px-2.5 py-1.5 bg-cyan-950 hover:bg-cyan-900 text-cyan-300 font-orbitron font-bold text-[10px] rounded-xl border border-cyan-500/40 transition active:scale-95">RECONECTAR</button>
+</div>
+
+<div class="bg-gradient-to-r from-red-950/80 via-slate-900 to-slate-950 border border-red-500/50 p-4 rounded-2xl flex items-center justify-between shadow-lg shadow-red-950/40 relative overflow-hidden group">
+<div class="absolute -right-4 -bottom-4 w-20 h-20 bg-red-600/20 rounded-full blur-xl"></div>
+<div class="relative z-10">
+<h3 class="text-xs font-orbitron font-bold text-red-400 tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-shield-cat text-red-500 animate-bounce"></i> ALERTA SOS FAMILIAR</h3>
+<p class="text-[11px] text-slate-300 mt-0.5">Llamar a: <strong class="text-white">María (Mamá)</strong></p>
+</div>
+<button id="app-sos-btn" class="relative z-10 px-4 py-2.5 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-orbitron font-bold text-xs rounded-xl shadow-lg shadow-red-600/40 transition-all flex items-center gap-1.5 border border-red-400/40"><i class="fa-solid fa-phone-flip text-xs"></i> SOS NOW</button>
+</div>
+
+<div class="bg-gradient-to-br from-cyan-950/60 to-purple-950/40 border border-cyan-500/30 p-3.5 rounded-2xl flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-cyan-500/20 border border-cyan-400 flex items-center justify-center relative"><div class="w-6 h-6 rounded-full bg-cyan-400/40 animate-ping"></div><i class="fa-solid fa-microphone text-cyan-300 relative z-10 text-sm"></i></div>
+<div><span class="text-[10px] text-cyan-400 font-mono block">ASISTENTE NOAH</span><p id="voice-instruction-text" class="text-xs text-white font-semibold">"Hola, soy NOAH. A 15 metros, gira a la derecha."</p></div>
+</div>
+<button id="btn-mic-pulse" class="w-8 h-8 rounded-full bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center text-cyan-300 hover:bg-cyan-500/40 transition"><i class="fa-solid fa-waveform text-xs"></i></button>
+</div>
+
+<div class="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl space-y-2.5">
+<div class="flex justify-between items-center text-xs">
+<span class="font-orbitron font-bold text-cyan-400 flex items-center gap-1.5"><i class="fa-solid fa-location-crosshairs text-cyan-300"></i> RUTA GPS HAPTIK</span>
+<span class="text-[10px] font-mono bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-800">EN CURSO</span>
+</div>
+<div class="h-32 bg-slate-950 rounded-xl relative overflow-hidden border border-cyan-500/20 flex items-center justify-center p-2">
+<div class="absolute inset-0 opacity-30 bg-[linear-gradient(to_right,#06b6d4_1px,transparent_1px),linear-gradient(to_bottom,#06b6d4_1px,transparent_1px)] bg-[size:14px_14px]"></div>
+<svg class="absolute inset-0 w-full h-full stroke-cyan-400" fill="none"><path d="M 40 100 Q 140 30 300 40" stroke-width="4" stroke-dasharray="8 4"></path></svg>
+<div class="absolute left-8 bottom-3 flex items-center gap-1.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-slate-950 font-bold px-2.5 py-1 rounded-full text-[10px] shadow-lg shadow-cyan-500/50 animate-bounce"><i class="fa-solid fa-person-walking"></i> Tú aquí</div>
+<div class="absolute right-4 top-3 text-emerald-300 text-xs font-bold flex items-center gap-1 bg-slate-900/95 px-2.5 py-1 rounded-xl border border-emerald-500/50 shadow-md"><i class="fa-solid fa-bullseye text-emerald-400"></i> Estación Central</div>
+</div>
+<div class="flex justify-between items-center text-[11px] text-slate-400 px-1 pt-0.5"><span>Distancia: <strong class="text-cyan-300 font-mono">240m</strong></span><span>Tiempo estimado: <strong class="text-cyan-300 font-mono">3 min</strong></span></div>
+</div>
+
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-slate-900/80 border border-slate-800 p-3 rounded-2xl space-y-1.5">
+<div class="flex justify-between items-center text-slate-400 text-[10px]"><span class="font-orbitron font-semibold">SENSOR PISO</span><i class="fa-solid fa-radar text-cyan-400"></i></div>
+<div class="text-base font-bold text-cyan-300 font-mono" id="telemetry-floor">1.8 METROS</div>
+<div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden"><div class="bg-gradient-to-r from-cyan-500 to-blue-400 h-full w-2/3"></div></div>
+</div>
+<div class="bg-slate-900/80 border border-slate-800 p-3 rounded-2xl space-y-1.5">
+<div class="flex justify-between items-center text-slate-400 text-[10px]"><span class="font-orbitron font-semibold">SENSOR CABEZA</span><i class="fa-solid fa-eye text-emerald-400"></i></div>
+<div class="text-base font-bold text-emerald-400 font-mono" id="telemetry-head">DESPEJADO</div>
+<div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden"><div class="bg-emerald-400 h-full w-full"></div></div>
+</div>
+</div>
+
+<div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl space-y-2.5">
+<h3 class="text-xs font-orbitron font-bold text-slate-300 flex items-center justify-between"><span>CONTACTOS DE CONFIANZA</span><button id="btn-add-contact" class="text-cyan-400 text-[11px] font-sans hover:underline">+ Agregar</button></h3>
+<div class="space-y-2" id="contacts-container">
+<div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 hover:border-cyan-500/40 transition">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 to-pink-500 text-white font-bold flex items-center justify-center text-xs shadow-md">M</div>
+<div><p class="text-xs font-bold text-white">María (Mamá)</p><p class="text-[10px] text-slate-400">+57 300 123 4567 • Primario</p></div>
+</div>
+<button onclick="simulateCall('María (Mamá)', '+57 300 123 4567')" class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 flex items-center justify-center transition border border-emerald-500/40"><i class="fa-solid fa-phone text-xs"></i></button>
+</div>
+<div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 hover:border-cyan-500/40 transition">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white font-bold flex items-center justify-center text-xs shadow-md">C</div>
+<div><p class="text-xs font-bold text-white">Carlos (Hermano)</p><p class="text-[10px] text-slate-400">+57 311 987 6543 • Secundario</p></div>
+</div>
+<button onclick="simulateCall('Carlos (Hermano)', '+57 311 987 6543')" class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 flex items-center justify-center transition border border-emerald-500/40"><i class="fa-solid fa-phone text-xs"></i></button>
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="view-call-screen" class="hidden flex-col items-center justify-between h-full py-6 px-4 bg-slate-950 rounded-2xl border-2 border-red-500 neon-glow-red text-center animate-fade-in space-y-5">
+<div class="space-y-2 mt-2">
+<span class="inline-block px-3.5 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-orbitron font-bold border border-red-500/60 animate-pulse"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i> PROTOCOLO SOS ACTIVO</span>
+<h2 class="text-2xl font-orbitron font-bold text-white" id="call-contact-name">María (Mamá)</h2>
+<p class="text-xs text-slate-300" id="call-status-text">Conectando llamada por altavoz HD...</p>
+<p class="text-sm font-mono text-cyan-300 font-bold tracking-widest" id="call-timer">00:03</p>
+</div>
+<div class="relative flex items-center justify-center">
+<div class="absolute w-36 h-36 bg-red-500/20 rounded-full animate-ping"></div>
+<div class="w-24 h-24 rounded-full bg-gradient-to-tr from-red-600 via-rose-600 to-red-500 text-white font-bold text-3xl flex items-center justify-center shadow-2xl relative z-10 border-2 border-white/30"><i class="fa-solid fa-user-shield"></i></div>
+</div>
+<div class="w-full bg-slate-900/90 p-3 rounded-2xl border border-red-500/30 text-left text-xs space-y-1.5">
+<div class="flex items-center justify-between text-emerald-400 font-semibold text-[11px]"><span><i class="fa-solid fa-paper-plane mr-1"></i> SMS GPS Enviado Automático</span><span class="text-[9px] bg-emerald-950 px-2 py-0.5 rounded text-emerald-300 border border-emerald-800">ENVIADO</span></div>
+<p class="text-slate-300 text-[11px] font-mono bg-slate-950 p-2.5 rounded-xl border border-slate-800">"¡EMERGENCIA BASTÓN! Ubicación en directo: maps.google.com/?q=4.6097,-74.0817"</p>
+</div>
+<div class="flex items-center justify-center gap-6 w-full pt-1">
+<button id="btn-toggle-speaker" class="w-13 h-13 p-3.5 rounded-full bg-slate-900 text-cyan-400 flex items-center justify-center text-lg shadow-lg border border-cyan-500/40"><i class="fa-solid fa-volume-high"></i></button>
+<button id="btn-end-call" class="w-16 h-16 rounded-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white flex items-center justify-center text-2xl shadow-xl shadow-red-600/50 active:scale-95 transition border border-white/20"><i class="fa-solid fa-phone-slash"></i></button>
+<button class="w-13 h-13 p-3.5 rounded-full bg-slate-900 text-slate-300 flex items-center justify-center text-lg shadow-lg border border-slate-700"><i class="fa-solid fa-microphone"></i></button>
+</div>
+</div>
+
+</div>
+
+<div class="pt-2.5 border-t border-slate-800/90 grid grid-cols-4 gap-1 text-center text-[10px] text-slate-400 relative z-10">
+<button class="flex flex-col items-center gap-1 text-cyan-400 font-semibold"><i class="fa-solid fa-house-user text-sm"></i><span>Inicio</span></button>
+<button class="flex flex-col items-center gap-1 hover:text-slate-200"><i class="fa-solid fa-map-location-dot text-sm"></i><span>Mapa</span></button>
+<button class="flex flex-col items-center gap-1 hover:text-slate-200"><i class="fa-solid fa-address-book text-sm"></i><span>Contactos</span></button>
+<button class="flex flex-col items-center gap-1 hover:text-slate-200"><i class="fa-solid fa-gear text-sm"></i><span>Ajustes</span></button>
+</div>
+
+</div>
+</div>
+
+</div>
+
+<script>
+let callTimerInterval = null;
+let callSeconds = 0;
+let audioCtx = null;
+
+function initAudio() {
+if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+}
+
+function playRingSound() {
+if (!audioCtx) return;
+try {
+const osc = audioCtx.createOscillator();
+const gain = audioCtx.createGain();
+osc.type = 'sine';
+osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+osc.connect(gain);
+gain.connect(audioCtx.destination);
+osc.start();
+osc.stop(audioCtx.currentTime + 0.5);
+} catch(e){}
+}
+
+function simulateCall(contactName, phoneNum) {
+initAudio();
+playRingSound();
+document.getElementById('view-dashboard').classList.add('hidden');
+const callScreen = document.getElementById('view-call-screen');
+callScreen.classList.remove('hidden');
+callScreen.classList.add('flex');
+document.getElementById('call-contact-name').textContent = contactName || 'María (Mamá)';
+document.getElementById('call-status-text').textContent = `Llamando a ${phoneNum || '+57 300 123 4567'}...`;
+callSeconds = 0;
+clearInterval(callTimerInterval);
+callTimerInterval = setInterval(() => {
+callSeconds++;
+const mins = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+const secs = String(callSeconds % 60).padStart(2, '0');
+document.getElementById('call-timer').textContent = `${mins}:${secs}`;
+if (callSeconds === 2) { document.getElementById('call-status-text').textContent = "Llamada conectada en Altavoz HD • Transmitiendo GPS..."; }
+}, 1000);
+}
+
+function endCall() {
+clearInterval(callTimerInterval);
+const callScreen = document.getElementById('view-call-screen');
+callScreen.classList.add('hidden');
+callScreen.classList.remove('flex');
+document.getElementById('view-dashboard').classList.remove('hidden');
+}
+
+window.onload = function() {
+let isBtConnected = true;
+document.getElementById('btn-toggle-bt')?.addEventListener('click', () => {
+isBtConnected = !isBtConnected;
+const badge = document.getElementById('bt-status-badge');
+const deviceName = document.getElementById('bt-device-name');
+const iconBg = document.getElementById('bt-icon-bg');
+if (isBtConnected) {
+badge.className = "text-[9px] bg-emerald-950 text-emerald-400 px-2 py-0.2 rounded-full border border-emerald-500/40 font-mono";
+badge.textContent = "VIRTUAL OK";
+deviceName.textContent = 'Bastón "SmartCane-V2" Vinculado';
+iconBg.className = "w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-400/50 flex items-center justify-center text-sm shadow-md shadow-cyan-500/30";
+} else {
+badge.className = "text-[9px] bg-red-950 text-red-400 px-2 py-0.2 rounded-full border border-red-500/40 font-mono";
+badge.textContent = "DESCONECTADO";
+deviceName.textContent = 'Buscando bastón...';
+iconBg.className = "w-8 h-8 rounded-xl bg-red-500/20 text-red-400 border border-red-400/50 flex items-center justify-center text-sm";
+}
+});
+document.getElementById('btn-trigger-panic').addEventListener('click', () => { simulateCall('María (Mamá)', '+57 300 123 4567'); });
+document.getElementById('app-sos-btn').addEventListener('click', () => { simulateCall('María (Mamá)', '+57 300 123 4567'); });
+document.getElementById('btn-end-call').addEventListener('click', endCall);
+document.getElementById('btn-add-contact').addEventListener('click', () => {
+const name = prompt("Nombre del contacto de emergencia:", "Papá (Juan)");
+const phone = prompt("Número de teléfono:", "+57 320 555 0199");
+if (name && phone) {
+const container = document.getElementById('contacts-container');
+const div = document.createElement('div');
+div.className = "flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 hover:border-cyan-500/40 transition";
+div.innerHTML = `<div class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 font-bold flex items-center justify-center text-xs shadow-md">${name.charAt(0)}</div><div><p class="text-xs font-bold text-white">${name}</p><p class="text-[10px] text-slate-400">${phone} • Personalizado</p></div></div><button onclick="simulateCall('${name}', '${phone}')" class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 flex items-center justify-center transition border border-emerald-500/40"><i class="fa-solid fa-phone text-xs"></i></button>`;
+container.appendChild(div);
+}
+});
+document.getElementById('download-app-html')?.addEventListener('click', () => {
+const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'app_baston_inteligente_sos_futurista.html';
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+});
+};
+</script>
+</body>
+</html>
